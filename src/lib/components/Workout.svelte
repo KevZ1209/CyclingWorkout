@@ -64,40 +64,54 @@
 
     let currEventTimeLeft = workoutData[currIndex].duration;
 
-    const intervalID = setInterval(render, 1000 / REFRESHES_PER_SECOND);
+    let isPaused = false;
+
+    let intervalID = setInterval(render, 1000 / REFRESHES_PER_SECOND);
 
     let workoutFinished = false;
 
-    
+    function nextBlock() {
+        if (currIndex+1 >= workoutData.length) {
+            clearInterval(intervalID);
+            workoutFinished = true;
+        }
+        else {
+            currIndex += 1;
+            progressIncrement = (100 / workoutData[currIndex].duration) / REFRESHES_PER_SECOND;
+            currEventTimeLeft = workoutData[currIndex].duration;
+            progressVal = 0;
+            
+        }
+    }
 
     function render() {
         progressVal = progressVal > 100 ? 0 : progressVal + progressIncrement;
-        counter = counter == 9 ? 0 : counter + 1;
-        if (counter == 9) {
+        counter = (counter == REFRESHES_PER_SECOND - 1 ? 0 : counter + 1);
+        if (counter == REFRESHES_PER_SECOND - 1) {
             if (currEventTimeLeft <= 1) {
-                
-                if (currIndex+1 >= workoutData.length) {
-                    clearInterval(intervalID);
-                    workoutFinished = true;
-                }
-                else {
-                    currIndex += 1;
-                    progressIncrement = (100 / workoutData[currIndex].duration) / 10;
-                    currEventTimeLeft = workoutData[currIndex].duration;
-                    progressVal = 0;
-                    
-                }
-
+                nextBlock();
             }
             else {
                 currEventTimeLeft -= 1;
             }
-            
-            
             totalSecs += 1;
         }
     }
 
+    function handlePauseButton() {
+        isPaused = !isPaused;
+        if (isPaused) {
+            clearInterval(intervalID)
+        }
+        else {
+            intervalID = setInterval(render, 1000 / REFRESHES_PER_SECOND);
+        }
+    }
+
+    function handleNext() {
+        totalSecs += currEventTimeLeft;
+        nextBlock();
+    }
 
 </script>
 
@@ -112,11 +126,23 @@
         <p>Time Remaining in Block: {convertTime(currEventTimeLeft)}</p>
         
 
-        <div class="flex w-full h-1.5 bg-gray-500 rounded-full overflow-hidde" role="progressbar" aria-valuenow="{progressVal}" aria-valuemin="0" aria-valuemax="100">
-            <div class=" opacity-50 flex flex-col justify-center rounded-full overflow-hidden bg-white text-xs text-white text-center whitespace-nowrap transition duration-500" style="width: {progressVal}%"></div>
+        <div class="flex w-full h-1.5 bg-gray-500 rounded-full overflow-hidde mt-8" role="progressbar" aria-valuenow="{progressVal}" aria-valuemin="0" aria-valuemax="100">
+            <div class=" opacity-50 flex flex-col justify-center rounded-full overflow-hidden bg-white text-xs text-white text-center whitespace-nowrap" style="width: {progressVal}%"></div>
         </div>
 
+        
+    </div>
+
+    <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50 m-8">
         <p>Time Elapsed: {convertTime(totalSecs)}</p>
+    </div>
+    <div class="w-3/4 max-w-md mx-auto text-center">
+        <button on:click={handlePauseButton} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
+            {isPaused ? "Resume" : "Pause"}
+        </button>
+        <button on:click={handleNext} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
+            Next Block
+        </button>
     </div>
 {/if}
 
