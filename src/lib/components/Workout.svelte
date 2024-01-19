@@ -57,6 +57,13 @@
 
     }
 
+    function convertTimeToText(secs) {
+        const minutes = Math.floor(secs / 60);
+        const seconds = secs % 60;
+
+        return minutes + " min " + seconds + " sec"
+    }
+
     let progressVal = 0;
 
     let progressIncrement = (100 / workoutData[0].duration) / REFRESHES_PER_SECOND;
@@ -124,6 +131,11 @@
             currIndex -= 2;
             nextBlock();
         }
+        else {
+            totalSecs -= (workoutData[currIndex].duration - currEventTimeLeft);
+            currIndex -= 1;
+            nextBlock();
+        }
     }
 
     function handleReset() {
@@ -147,6 +159,7 @@
     </div>
 {:else}
     <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
+        <p>Block {currIndex+1} of {workoutData.length}</p>
         <p>Intensity: {workoutData[currIndex].intensity}</p>
         <p>RPM: {workoutData[currIndex].rpm}</p>
         <p>Time Remaining in Block: {convertTime(currEventTimeLeft)}</p>
@@ -162,7 +175,7 @@
         <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50 mt-8">
             {#if (currIndex+1 < workoutData.length)}
                 <p>Next Up: </p>
-                <p>{workoutData[currIndex+1].intensity} intensity, {workoutData[currIndex+1].rpm} RPM for {convertTime(workoutData[currIndex+1].duration)}</p>
+                <p>{workoutData[currIndex+1].intensity}, {workoutData[currIndex+1].rpm} RPM for {convertTimeToText(workoutData[currIndex+1].duration)}</p>
             {:else}
                 <p>Next Up: </p>
                 <p>No more!</p>
@@ -176,18 +189,18 @@
     </div>
     <div class="w-3/4 max-w-md mx-auto text-center">
         <button on:click={handlePrevious} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
-            <SkipBack class="h-4"/>
+            <SkipBack class="h-5"/>
         </button>
         <button on:click={handlePauseButton} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
             <!-- {isPaused ? "Resume" : "Pause"} -->
             {#if (isPaused)}
-                <Play class="h-4"/>
+                <Play class="h-5"/>
             {:else}
-                <Pause class="h-4"/>
+                <Pause class="h-5"/>
             {/if}
         </button>
         <button on:click={handleNext} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
-            <SkipForward class="h-4"/>
+            <SkipForward class="h-5"/>
         </button>
     </div>
 {/if}
