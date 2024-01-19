@@ -1,6 +1,11 @@
 <script>
 
-    const REFRESHES_PER_SECOND = 10;
+    import { Play } from 'lucide-svelte';
+    import { Pause } from 'lucide-svelte';
+    import { SkipForward } from 'lucide-svelte';
+    import { SkipBack } from 'lucide-svelte';
+
+    const REFRESHES_PER_SECOND = 30;
 
     const workout1 = [
         {"time": "0:00", "intensity": "Easy", "rpm": "60-100", "duration": 90},
@@ -34,7 +39,7 @@
     ]
 
     // set default prop value
-    export const workoutData = workout2;
+    export const workoutData = workout1;
 
     function convertTime(secs) {
         const minutes = Math.floor(secs / 60);
@@ -113,11 +118,32 @@
         nextBlock();
     }
 
+    function handlePrevious() {
+        if (currIndex > 0) {
+            totalSecs -= (workoutData[currIndex-1].duration + (workoutData[currIndex].duration - currEventTimeLeft));
+            currIndex -= 2;
+            nextBlock();
+        }
+    }
+
+    function handleReset() {
+        currIndex = -1;
+        totalSecs = 0;
+        nextBlock();
+        workoutFinished = false;
+        intervalID = setInterval(render, 1000 / REFRESHES_PER_SECOND);
+    }
+
 </script>
 
 {#if (workoutFinished)}
     <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
         <p>Finished!</p>
+    </div>
+    <div class="w-3/4 max-w-md mx-auto text-center m-8">
+        <button on:click={handleReset} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
+            Reset
+        </button>
     </div>
 {:else}
     <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
@@ -132,16 +158,36 @@
 
         
     </div>
+    
+        <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50 mt-8">
+            {#if (currIndex+1 < workoutData.length)}
+                <p>Next Up: </p>
+                <p>{workoutData[currIndex+1].intensity} intensity, {workoutData[currIndex+1].rpm} RPM for {convertTime(workoutData[currIndex+1].duration)}</p>
+            {:else}
+                <p>Next Up: </p>
+                <p>No more!</p>
+            {/if}
+            
+        </div>
+    
 
     <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50 m-8">
         <p>Time Elapsed: {convertTime(totalSecs)}</p>
     </div>
     <div class="w-3/4 max-w-md mx-auto text-center">
+        <button on:click={handlePrevious} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
+            <SkipBack class="h-4"/>
+        </button>
         <button on:click={handlePauseButton} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
-            {isPaused ? "Resume" : "Pause"}
+            <!-- {isPaused ? "Resume" : "Pause"} -->
+            {#if (isPaused)}
+                <Play class="h-4"/>
+            {:else}
+                <Pause class="h-4"/>
+            {/if}
         </button>
         <button on:click={handleNext} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
-            Next Block
+            <SkipForward class="h-4"/>
         </button>
     </div>
 {/if}
