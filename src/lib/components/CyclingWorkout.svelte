@@ -4,8 +4,9 @@
     import { Pause } from 'lucide-svelte';
     import { SkipForward } from 'lucide-svelte';
     import { SkipBack } from 'lucide-svelte';
+    import { Home } from 'lucide-svelte';
 
-    const REFRESHES_PER_SECOND = 30;
+    const REFRESHES_PER_SECOND = 5;
     const FLASH_INTERVAL = 100;
 
     const workout1 = [
@@ -168,6 +169,13 @@
             Reset
         </button>
     </div>
+    <div class="text-center">
+        <a href="/" class="text-center">
+            <div class="inline-block text-white text-opacity-50 hover:text-opacity-80 border-2 border-white rounded hover:border-opacity-50 border-opacity-20 bg-white bg-opacity-5 py-2 px-4">
+                <Home class="h-5"/>
+            </div>
+        </a>
+    </div>
 {:else}
     <div class="{flash ? 'bg-opacity-50' : 'bg-opacity-5'} w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
         <p>Block {currIndex+1} of {workoutData.length}</p>
@@ -203,7 +211,6 @@
             <SkipBack class="h-5"/>
         </button>
         <button on:click={handlePauseButton} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
-            <!-- {isPaused ? "Resume" : "Pause"} -->
             {#if (isPaused)}
                 <Play class="h-5"/>
             {:else}
@@ -213,6 +220,13 @@
         <button on:click={handleNext} class="bg-white bg-opacity-5 border-opacity-20 text-white text-opacity-50 py-2 px-4 border-2 border-white rounded hover:border-opacity-50 hover:text-opacity-80">
             <SkipForward class="h-5"/>
         </button>
+    </div>
+    <div class="text-center">
+        <a href="/" class="text-center">
+            <div class="inline-block text-white text-opacity-50 hover:text-opacity-80 mt-8 border-2 border-white rounded hover:border-opacity-50 border-opacity-20 bg-white bg-opacity-5 py-2 px-4">
+                <Home class="h-5"/>
+            </div>
+        </a>
     </div>
 {/if}
 
