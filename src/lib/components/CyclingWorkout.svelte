@@ -6,6 +6,7 @@
     import { SkipBack } from 'lucide-svelte';
 
     const REFRESHES_PER_SECOND = 30;
+    const FLASH_INTERVAL = 100;
 
     const workout1 = [
         {"time": "0:00", "intensity": "Easy", "rpm": "60-100", "duration": 90},
@@ -31,7 +32,7 @@
         {"time": "20:20", "intensity": "Easy", "rpm": "60+", "duration": 40}
     ]
 
-    const workout2 = [
+    const testWorkout = [
         {"time": "0:00", "intensity": "Easy", "rpm": "60-100", "duration": 5},
         {"time": "1:30", "intensity": "Moderate", "rpm": "60-100", "duration": 10},
         {"time": "4:30", "intensity": "Easy", "rpm": "55-65", "duration": 5},
@@ -82,7 +83,17 @@
 
     let workoutFinished = false;
 
+    let flash = false;
+
+    function handleFlash() {
+        flash = true;
+        setTimeout(() => {flash = false}, FLASH_INTERVAL);
+        setTimeout(() => {flash = true}, FLASH_INTERVAL * 2);
+        setTimeout(() => {flash = false}, FLASH_INTERVAL * 3);
+    }
+
     function nextBlock() {
+        handleFlash();
         if (currIndex+1 >= workoutData.length) {
             clearInterval(intervalID);
             workoutFinished = true;
@@ -147,7 +158,7 @@
     }
 
 </script>
-
+<h1 class="text-center py-8 text-3xl text-white">Cycling Workout</h1>
 {#if (workoutFinished)}
     <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
         <p>Finished!</p>
@@ -158,16 +169,16 @@
         </button>
     </div>
 {:else}
-    <div class="w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
+    <div class="{flash ? 'bg-opacity-50' : 'bg-opacity-5'} w-3/4 max-w-md mx-auto border-2 border-white rounded-lg p-3 text-white text-xl bg-white bg-opacity-5 border-opacity-20 text-opacity-50">
         <p>Block {currIndex+1} of {workoutData.length}</p>
         <p>Intensity: {workoutData[currIndex].intensity}</p>
         <p>RPM: {workoutData[currIndex].rpm}</p>
-        <p>Time Remaining in Block: {convertTime(currEventTimeLeft)}</p>
         
 
         <div class="flex w-full h-1.5 bg-gray-500 rounded-full overflow-hidde mt-8" role="progressbar" aria-valuenow="{progressVal}" aria-valuemin="0" aria-valuemax="100">
             <div class=" opacity-50 flex flex-col justify-center rounded-full overflow-hidden bg-white text-xs text-white text-center whitespace-nowrap" style="width: {progressVal}%"></div>
         </div>
+        <p class="text-center">{convertTime(currEventTimeLeft)}</p>
 
         
     </div>
